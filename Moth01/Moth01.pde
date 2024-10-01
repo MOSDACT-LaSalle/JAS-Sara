@@ -9,12 +9,10 @@ boolean tileEffect = false;
 boolean pixelMothEffect = false;
 int radarRadius = 0; // For radar effect
 
-float cubeRotationX = 0; // Rotation for 3D cube
-float cubeRotationY = 0;
-
 void setup() {
   size(800, 800, P3D); // Canvas size with P3D renderer for 3D scenes
   noCursor();  // Hide the cursor
+  fullScreen(); // Full screen
   frameRate(60); // Smooth frame rate
   moth01 = loadImage("moth01.png");  // Load moth01 image
   moth02 = loadImage("moth02.png");  // Load moth02 image
@@ -47,70 +45,7 @@ void draw() {
   } else if (scene == 3) {
     imageMode(CORNER);
     image(moth03, 0, height - 400, 400, 400);  // Moth03 in bottom-left corner (400x400)
-  } else if (scene == 4) {
-    // 3D scene with a rotating cube
-    background(0); // Clear the screen with black background
-
-    lights();  // Add 3D lights for better visibility of the cube
-    directionalLight(150, 150, 150, 1, 0, -1); // Light from the right
-    pointLight(255, 255, 255, width / 2, height / 2, 200); // Point light at the center
-    
-    translate(width / 2, height / 2);  // Move to the center of the canvas
-    rotateX(cubeRotationX);  // Rotate around the X axis
-    rotateY(cubeRotationY);  // Rotate around the Y axis
-    
-    // Draw the 3D cube and apply the image to all six sides
-    textureMode(NORMAL);  // Use texture mode for image mapping
-    beginShape(QUADS);
-    
-    // Front face
-    texture(moth02);
-    vertex(-150, -150, 150, 0, 0);
-    vertex(150, -150, 150, 1, 0);
-    vertex(150, 150, 150, 1, 1);
-    vertex(-150, 150, 150, 0, 1);
-    
-    // Right face
-    texture(moth03);
-    vertex(150, -150, 150, 0, 0);
-    vertex(150, -150, -150, 1, 0);
-    vertex(150, 150, -150, 1, 1);
-    vertex(150, 150, 150, 0, 1);
-    
-    // Back face
-    texture(moth02);
-    vertex(150, -150, -150, 0, 0);
-    vertex(-150, -150, -150, 1, 0);
-    vertex(-150, 150, -150, 1, 1);
-    vertex(150, 150, -150, 0, 1);
-    
-    // Left face
-    texture(moth03);
-    vertex(-150, -150, -150, 0, 0);
-    vertex(-150, -150, 150, 1, 0);
-    vertex(-150, 150, 150, 1, 1);
-    vertex(-150, 150, -150, 0, 1);
-
-    // Top face
-    texture(moth02);
-    vertex(-150, -150, -150, 0, 0);
-    vertex(150, -150, -150, 1, 0);
-    vertex(150, -150, 150, 1, 1);
-    vertex(-150, -150, 150, 0, 1);
-
-    // Bottom face
-    texture(moth03);
-    vertex(-150, 150, -150, 0, 0);
-    vertex(150, 150, -150, 1, 0);
-    vertex(150, 150, 150, 1, 1);
-    vertex(-150, 150, 150, 0, 1);
-    
-    endShape();
-    
-    // Update cube rotations
-    cubeRotationX += 0.01;
-    cubeRotationY += 0.01;
-  } 
+  }
 
   // Apply effects globally across all scenes
   if (invertFlash) {
@@ -119,11 +54,12 @@ void draw() {
 
   // Radar effect: Neon circle outline growing from the center ('o' key)
   if (circleOutlineEffect) {
-    stroke(0, 255, 0);
+    stroke(0, 255, 0); // Neon green stroke
     noFill();
-    radarRadius += 10; // Faster expansion for radar effect
-    ellipse(width / 2, height / 2, radarRadius, radarRadius); // Draw expanding circles from the center
-    if (radarRadius > width) radarRadius = 0; // Reset radius when it reaches the edge
+    strokeWeight(2); // Thinner lines
+    radarRadius += 20; // Increment the circle size faster
+    circle(width / 2, height / 2, radarRadius); // Draw expanding circles from the center
+    if (radarRadius > 800) radarRadius = 0; // Reset the radius when it exceeds 800
   }
 
   // Glitch effect: Ripple-like lines with more space between them ('g' key)
@@ -209,10 +145,6 @@ void keyPressed() {
     scene = 3;  // Scene 3 with Moth03
   }
 
-  if (key == '4') {
-    scene = 4;  // Scene 4 with 3D cube
-  }
-
   // Invert flash effect ('i' key)
   if (key == 'i') {
     invertFlash = !invertFlash;  // Toggle flash effect
@@ -228,13 +160,8 @@ void keyPressed() {
     circleOutlineEffect = !circleOutlineEffect;  // Toggle radar circle effect
   }
 
-  // Glitch effect with ripple-like lines ('g' key)
-  if (key == 'g') {
-    glitchEffect = !glitchEffect;  // Toggle ripple effect
-  }
-
   // Tiling effect of Moth02 and Moth03 (fills the whole screen) ('t' key)
-  if (key == 't') {
+  if (key == 't' && scene != 1) { // Ensure 't' doesn't work in Scene 1
     tileEffect = !tileEffect;  // Toggle tiling effect
   }
 
