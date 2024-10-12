@@ -9,8 +9,12 @@ boolean tileEffect = false;
 boolean pixelMothEffect = false;
 int radarRadius = 0; // For radar effect
 
+// Variables for circular motion in Scene 1
+float angle = 0; // Initialize the angle for circular motion
+float radius = 200; // Set the radius for the circular path
+
 void setup() {
-  size(800, 800, P3D); // Canvas size with P3D renderer for 3D scenes
+  size(800, 800);
   noCursor();  // Hide the cursor
   fullScreen(); // Full screen
   frameRate(60); // Smooth frame rate
@@ -19,7 +23,7 @@ void setup() {
   moth03 = loadImage("moth03.png");  // Load moth03 image
 
   // Load fonts
-  defaultFont = createFont("Arial", 70);  // Default font
+  defaultFont = createFont("Arial", 100);  // Default font
   
   background(0); // Start with black background
 }
@@ -34,11 +38,14 @@ void draw() {
   // Display image based on the scene
   if (scene == 1) {
     imageMode(CENTER);
-    if (mouseX == 0 && mouseY == 0) {
-      image(moth01, width / 2, height / 2, random(400, 420), random(400, 420)); // Moth01 centered
-    } else {
-      image(moth01, mouseX, mouseY, random(400, 420), random(400, 420)); // Follow the mouse
-    }
+    
+    // Circular motion for the moth
+    float x = width / 2 + cos(angle) * radius; // X coordinate on the circular path
+    float y = height / 2 + sin(angle) * radius; // Y coordinate on the circular path
+    
+    image(moth01, x, y, random(400, 420), random(400, 420)); // Moth01 moves in circular motion
+
+    angle += 0.03; // Increment the angle for continuous motion (adjust speed by changing this value)
   } else if (scene == 2) {
     imageMode(CORNER);
     image(moth02, width - 400, 0, 400, 400);  // Moth02 in top-right corner (400x400)
@@ -60,20 +67,6 @@ void draw() {
     radarRadius += 20; // Increment the circle size faster
     circle(width / 2, height / 2, radarRadius); // Draw expanding circles from the center
     if (radarRadius > 800) radarRadius = 0; // Reset the radius when it exceeds 800
-  }
-
-  // Glitch effect: Ripple-like lines with more space between them ('g' key)
-  if (glitchEffect) {
-    int numLines = 100; // Number of ripple lines
-    stroke(0, 255, 0); // Neon green for ripple effect
-    noFill();
-    for (int i = 0; i < numLines; i += 4) { // Increased spacing between lines
-      float x = random(width);
-      float y = random(height);
-      float lineLength = width * random(0.4, 0.7);
-      float noiseFactor = noise(i * 0.1, millis() * 0.0005);
-      line(x, y, x + lineLength * noiseFactor, y + lineLength * noiseFactor); // Random ripple lines
-    }
   }
 
   // Tiling effect: Different grid sizes for Scene 2 and Scene 3 when 't' is pressed
@@ -119,7 +112,7 @@ void spellPhrase() {
   textSize(90);  // Bigger font size
 
   for (int i = 0; i < phrase.length(); i++) {
-    // Randomly choose between default font and gothic font
+
     if (random(1) > 0.5) {
       textFont(defaultFont);  // Default font
     }
@@ -134,7 +127,7 @@ void spellPhrase() {
 // Keyboard controls for effects
 void keyPressed() {
   if (key == '1') {
-    scene = 1;  // Scene 1 with Moth01
+    scene = 1;  // Scene 1 with circular motion of Moth01
   }
 
   if (key == '2') {
